@@ -29,6 +29,7 @@ public class TheatreService {
     private final TheatreRepo theatreRepo;
     private final CityRepo cityRepo;
 
+    @Transactional
     @CachePut(key = "#result.name", value = "THEATRE_CACHE")
     @Caching(evict = {
             @CacheEvict(key = "#result.city.name", value = "THEATRE_CITY_CACHE_LIST"),
@@ -51,6 +52,7 @@ public class TheatreService {
         return toTheatreResponse(savedTheatre, cityResponse);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(key = "#name", value = "THEATRE_CACHE")
     public TheatreResponse getTheatreByName(String name){
         Theatre theatre = theatreRepo.findByName(name).orElseThrow(() -> {
@@ -78,6 +80,7 @@ public class TheatreService {
         return theatre.getCity().getName();
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(key = "#name", value = "THEATRE_CITY_CACHE_LIST")
     public List<TheatreResponse> getAllTheatreByCity(String name){
         List<Theatre> theatres = theatreRepo.findByCityName(name);
@@ -102,6 +105,7 @@ public class TheatreService {
         theatreRepo.deleteAllByName(name);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(key = "'allTheatre'", value = "ALL_THEATRE_CACHE_LIST")
     public List<TheatreResponse> getAllTheatres(){
         List<Theatre> theatres = theatreRepo.findAll();

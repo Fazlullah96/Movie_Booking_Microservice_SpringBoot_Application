@@ -1,5 +1,6 @@
 package com.example.dtos;
 
+import com.example.models.Seat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -19,14 +20,14 @@ public class SeatRequest {
     @Max(value = 5)
     @Min(value = 1)
     private Integer seatNumber;
-    @Pattern(regexp = "^(VIP|PREMIUM|STANDARD)$", message = "Invalid Seat Type")
-    private SeatType seatType;
+//    @Pattern(regexp = "^(VIP|PREMIUM|STANDARD)$", message = "Invalid Seat Type")
+    private Seat.SeatType seatType;
     @NotNull(message = "ScreenId cannot be Empty")
     private Integer screenId;
 
-    public enum SeatType{
-        VIP,
-        PREMIUM,
-        STANDARD
-    }
+//    public enum SeatType{
+//        VIP,
+//        PREMIUM,
+//        STANDARD
+//    }
 }

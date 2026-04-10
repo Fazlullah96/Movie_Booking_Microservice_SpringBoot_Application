@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class CityService {
     private final CityRepo cityRepo;
 
+    @Transactional
     @CachePut(key = "#result.name", value = "CITY_CACHE")
     public CityResponse addCity(CityRequest request){
         boolean isCityExist = cityRepo.existsByName(request.getName());
@@ -36,6 +37,7 @@ public class CityService {
         return toCityResponse(savedCity);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(key = "#name", value = "CITY_CACHE")
     public CityResponse getCityByName(String name){
         City city = cityRepo.findByName(name).orElseThrow(() -> {
@@ -57,6 +59,7 @@ public class CityService {
         log.info("City {} deleted", name);
     }
 
+    @Transactional(readOnly = true)
     public List<CityResponse> getAllCities(){
         List<City> cities = cityRepo.findAll();
         return cities

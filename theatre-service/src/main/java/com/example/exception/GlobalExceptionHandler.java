@@ -74,4 +74,52 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.ALREADY_REPORTED);
     }
+
+    @ExceptionHandler(ScreenAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessage> screenAlreadyExistsException(
+            ScreenAlreadyExistsException ex,
+            HttpServletRequest request
+    ){
+        ErrorMessage error = ErrorMessage
+                .builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.ALREADY_REPORTED.value())
+                .error(HttpStatus.ALREADY_REPORTED.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.ALREADY_REPORTED);
+    }
+
+    @ExceptionHandler(ScreenNotFoundException.class)
+    public ResponseEntity<ErrorMessage> screenNotFoundException(
+            ScreenNotFoundException ex,
+            HttpServletRequest request
+    ){
+        ErrorMessage error = ErrorMessage
+                .builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SeatAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessage> seatAlreadyExistsException(
+            SeatAlreadyExistsException ex,
+            HttpServletRequest request
+    ){
+        ErrorMessage error = ErrorMessage
+                .builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.ALREADY_REPORTED.value())
+                .error(HttpStatus.ALREADY_REPORTED.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.ALREADY_REPORTED);
+    }
 }
