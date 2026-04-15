@@ -117,6 +117,7 @@ public class MovieService {
                 .language(movie.getLanguage())
                 .posterImageUrl(movie.getPosterImageUrl())
                 .trailerUrl(movie.getTrailerUrl())
+                .isActive(movie.getIsActive())
                 .build();
     }
 

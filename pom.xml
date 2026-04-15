@@ -13,6 +13,7 @@
         <module>eureka-server</module>
         <module>api-gateway</module>
         <module>theatre-service</module>
+        <module>showtime-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
