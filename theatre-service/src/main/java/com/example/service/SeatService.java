@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.component.MapperComponent;
 import com.example.dtos.*;
 import com.example.exception.ScreenNotFoundException;
 import com.example.exception.SeatAlreadyExistsException;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class SeatService {
     private final SeatRepo seatRepo;
     private final ScreenRepo screenRepo;
+    private final MapperComponent mapper;
 
     @Transactional
     public SeatResponse addSeat(SeatRequest request){
@@ -35,11 +37,11 @@ public class SeatService {
         Screen screen = screenRepo.findById(request.getScreenId()).orElseThrow(() -> {
             return new ScreenNotFoundException("ScreenId: " + request.getScreenId()+" not found");
         });
-        Seat seat = toSeatModel(request, screen);
+        Seat seat = mapper.toSeatModel(request, screen);
         Seat savedSeat = seatRepo.save(seat);
         Theatre theatre = screen.getTheatre();
         City city = theatre.getCity();
-        return toSeatResponse(savedSeat, toScreenResponse(screen, toTheatreResponse(theatre, toCityResponse(city))));
+        return mapper.toSeatResponse(savedSeat, mapper.toScreenResponse(screen, mapper.toTheatreResponse(theatre, mapper.toCityResponse(city))));
     }
 
     @Transactional
@@ -65,60 +67,60 @@ public class SeatService {
                     if(!seatInCurrentRequest.add(seatIdentifier)){
                         throw new SeatAlreadyExistsException("Duplicate SeatRow "+seat.getSeatRow()+" and seatNumber " + seat.getSeatNumber()+" in this screen");
                     }
-                    return toSeatModel(seat, screen);
+                    return mapper.toSeatModel(seat, screen);
                 }).collect(Collectors.toList());
         List<Seat> savedSeats = seatRepo.saveAll(needToSave);
         return savedSeats
                 .stream()
-                .map(seat -> toSeatResponse(seat, toScreenResponse(screen, toTheatreResponse(screen.getTheatre(), toCityResponse(screen.getTheatre().getCity())))))
+                .map(seat -> mapper.toSeatResponse(seat, mapper.toScreenResponse(screen, mapper.toTheatreResponse(screen.getTheatre(), mapper.toCityResponse(screen.getTheatre().getCity())))))
                 .collect(Collectors.toList());
     }
 
-    public SeatResponse toSeatResponse(Seat seat, ScreenResponse screenResponse){
-        return SeatResponse
-                .builder()
-                .id(seat.getId())
-                .seatRow(seat.getSeatRow())
-                .seatNumber(seat.getSeatNumber())
-                .seatType(seat.getSeatType())
-                .screenResponse(screenResponse)
-                .build();
-    }
-
-    public Seat toSeatModel(SeatRequest request, Screen screen){
-        return Seat
-                .builder()
-                .seatRow(request.getSeatRow())
-                .seatNumber(request.getSeatNumber())
-                .seatType(request.getSeatType())
-                .screen(screen)
-                .build();
-    }
-
-    public ScreenResponse toScreenResponse(Screen screen, TheatreResponse theatre){
-        return ScreenResponse
-                .builder()
-                .id(screen.getId())
-                .name(screen.getName())
-                .theatre(theatre)
-                .build();
-    }
-
-    public TheatreResponse toTheatreResponse(Theatre theatre, CityResponse cityResponse){
-        return TheatreResponse
-                .builder()
-                .name(theatre.getName())
-                .address(theatre.getAddress())
-                .city(cityResponse)
-                .build();
-    }
-
-    public CityResponse toCityResponse(City city){
-        return CityResponse
-                .builder()
-                .id(city.getId())
-                .name(city.getName())
-                .state(city.getState())
-                .build();
-    }
+//    public SeatResponse toSeatResponse(Seat seat, ScreenResponse screenResponse){
+//        return SeatResponse
+//                .builder()
+//                .id(seat.getId())
+//                .seatRow(seat.getSeatRow())
+//                .seatNumber(seat.getSeatNumber())
+//                .seatType(seat.getSeatType())
+//                .screenResponse(screenResponse)
+//                .build();
+//    }
+//
+//    public Seat toSeatModel(SeatRequest request, Screen screen){
+//        return Seat
+//                .builder()
+//                .seatRow(request.getSeatRow())
+//                .seatNumber(request.getSeatNumber())
+//                .seatType(request.getSeatType())
+//                .screen(screen)
+//                .build();
+//    }
+//
+//    public ScreenResponse toScreenResponse(Screen screen, TheatreResponse theatre){
+//        return ScreenResponse
+//                .builder()
+//                .id(screen.getId())
+//                .name(screen.getName())
+//                .theatre(theatre)
+//                .build();
+//    }
+//
+//    public TheatreResponse toTheatreResponse(Theatre theatre, CityResponse cityResponse){
+//        return TheatreResponse
+//                .builder()
+//                .name(theatre.getName())
+//                .address(theatre.getAddress())
+//                .city(cityResponse)
+//                .build();
+//    }
+//
+//    public CityResponse toCityResponse(City city){
+//        return CityResponse
+//                .builder()
+//                .id(city.getId())
+//                .name(city.getName())
+//                .state(city.getState())
+//                .build();
+//    }
 }

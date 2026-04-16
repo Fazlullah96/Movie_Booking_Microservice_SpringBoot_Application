@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.component.MapperComponent;
 import com.example.dtos.CityRequest;
 import com.example.dtos.CityResponse;
 import com.example.exception.CityAlreadyExistsException;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CityService {
     private final CityRepo cityRepo;
+    private final MapperComponent mapper;
 
     @Transactional
     @CachePut(key = "#result.name", value = "CITY_CACHE")
@@ -31,10 +33,10 @@ public class CityService {
             log.error("City {} already exist", request.getName());
             throw new CityAlreadyExistsException("City already exist with Name: " + request.getName());
         }
-        City city = toCityModel(request);
+        City city = mapper.toCityModel(request);
         City savedCity = cityRepo.save(city);
         log.info("City {} added successfully", savedCity.getName());
-        return toCityResponse(savedCity);
+        return mapper.toCityResponse(savedCity);
     }
 
     @Transactional(readOnly = true)
@@ -45,7 +47,7 @@ public class CityService {
             return new CityNotFoundException("City not found by Name : " + name);
         });
         log.info("City {} found", name);
-        return toCityResponse(city);
+        return mapper.toCityResponse(city);
     }
 
     @Transactional
@@ -64,25 +66,25 @@ public class CityService {
         List<City> cities = cityRepo.findAll();
         return cities
                 .stream()
-                .map(city -> toCityResponse(city))
+                .map(city -> mapper.toCityResponse(city))
                 .collect(Collectors.toList());
     }
 
-    public City toCityModel(CityRequest request){
-        return City
-                .builder()
-                .name(request.getName())
-                .state(request.getState())
-                .build();
-    }
-
-    public CityResponse toCityResponse(City city){
-        return CityResponse
-                .builder()
-                .id(city.getId())
-                .name(city.getName())
-                .state(city.getState())
-                .build();
-    }
+//    public City toCityModel(CityRequest request){
+//        return City
+//                .builder()
+//                .name(request.getName())
+//                .state(request.getState())
+//                .build();
+//    }
+//
+//    public CityResponse toCityResponse(City city){
+//        return CityResponse
+//                .builder()
+//                .id(city.getId())
+//                .name(city.getName())
+//                .state(city.getState())
+//                .build();
+//    }
 
 }

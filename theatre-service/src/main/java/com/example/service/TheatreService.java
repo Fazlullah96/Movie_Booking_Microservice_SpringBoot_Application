@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.component.MapperComponent;
 import com.example.dtos.CityResponse;
 import com.example.dtos.TheatreRequest;
 import com.example.dtos.TheatreResponse;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class TheatreService {
     private final TheatreRepo theatreRepo;
     private final CityRepo cityRepo;
+    private final MapperComponent mapper;
 
     @Transactional
     @CachePut(key = "#result.name", value = "THEATRE_CACHE")
@@ -44,12 +46,12 @@ public class TheatreService {
         if(isTheatreExist){
             throw new TheatreAlreadyExistException("Theatre "+ request.getName() + " already Exist");
         }
-        Theatre theatre = toTheatreModel(request);
+        Theatre theatre = mapper.toTheatreModel(request);
         theatre.setCity(city);
         Theatre savedTheatre = theatreRepo.save(theatre);
-        CityResponse cityResponse = toCityResponse(city);
+        CityResponse cityResponse = mapper.toCityResponse(city);
         log.info("Theatre {} added successfully", savedTheatre.getName());
-        return toTheatreResponse(savedTheatre, cityResponse);
+        return mapper.toTheatreResponse(savedTheatre, cityResponse);
     }
 
     @Transactional(readOnly = true)
@@ -60,9 +62,9 @@ public class TheatreService {
             return new TheatreNotFoundException("Theatre Not found for Name: " + name);
         });
         City city = theatre.getCity();
-        CityResponse cityResponse = toCityResponse(city);
+        CityResponse cityResponse = mapper.toCityResponse(city);
         log.info("Theatre {} fetched successfully", name);
-        return toTheatreResponse(theatre, cityResponse);
+        return mapper.toTheatreResponse(theatre, cityResponse);
     }
 
     @Transactional
@@ -87,7 +89,7 @@ public class TheatreService {
         log.info("Found all theatre in city {}", name);
         return theatres
                 .stream()
-                .map(theatre -> toTheatreResponse(theatre, toCityResponse(theatre.getCity())))
+                .map(theatre -> mapper.toTheatreResponse(theatre, mapper.toCityResponse(theatre.getCity())))
                 .collect(Collectors.toList());
     }
 
@@ -111,33 +113,33 @@ public class TheatreService {
         List<Theatre> theatres = theatreRepo.findAll();
         return theatres
                 .stream()
-                .map(theatre -> toTheatreResponse(theatre, toCityResponse(theatre.getCity())))
+                .map(theatre -> mapper.toTheatreResponse(theatre, mapper.toCityResponse(theatre.getCity())))
                 .collect(Collectors.toList());
     }
 
-    public Theatre toTheatreModel(TheatreRequest request){
-        return Theatre
-                .builder()
-                .name(request.getName())
-                .address(request.getAddress())
-                .build();
-    }
-
-    public TheatreResponse toTheatreResponse(Theatre theatre, CityResponse cityResponse){
-        return TheatreResponse
-                .builder()
-                .name(theatre.getName())
-                .address(theatre.getAddress())
-                .city(cityResponse)
-                .build();
-    }
-
-    public CityResponse toCityResponse(City city){
-        return CityResponse
-                .builder()
-                .id(city.getId())
-                .name(city.getName())
-                .state(city.getState())
-                .build();
-    }
+//    public Theatre toTheatreModel(TheatreRequest request){
+//        return Theatre
+//                .builder()
+//                .name(request.getName())
+//                .address(request.getAddress())
+//                .build();
+//    }
+//
+//    public TheatreResponse toTheatreResponse(Theatre theatre, CityResponse cityResponse){
+//        return TheatreResponse
+//                .builder()
+//                .name(theatre.getName())
+//                .address(theatre.getAddress())
+//                .city(cityResponse)
+//                .build();
+//    }
+//
+//    public CityResponse toCityResponse(City city){
+//        return CityResponse
+//                .builder()
+//                .id(city.getId())
+//                .name(city.getName())
+//                .state(city.getState())
+//                .build();
+//    }
 }

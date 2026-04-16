@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.component.MapperComponent;
 import com.example.dtos.MovieRequest;
 import com.example.dtos.MovieResponse;
 import com.example.exception.MovieNotFoundException;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MovieService {
     private final MovieRepo movieRepo;
+    private final MapperComponent mapper;
 
     @CachePut(key = "#result.id", value = "MOVIE_CACHE")
     @Caching(evict = {
@@ -30,11 +32,11 @@ public class MovieService {
             @CacheEvict(value = "MOVIE_INACTIVE_CACHE_LIST", allEntries = true)
     })
     public MovieResponse addMovie(MovieRequest request){
-        Movie movie = toMovieEntity(request);
+        Movie movie = mapper.toMovieEntity(request);
         movie.setIsActive(true);
         Movie savedMovie = movieRepo.save(movie);
         log.info("Movie {} saved to the DB", savedMovie.getTitle());
-        return toMovieResponse(savedMovie);
+        return mapper.toMovieResponse(savedMovie);
     }
 
     @Cacheable(key = "#id", value = "MOVIE_CACHE")
@@ -42,7 +44,7 @@ public class MovieService {
         Movie movie = movieRepo.findById(id).orElseThrow(
                 () -> new MovieNotFoundException("Movie Not found for Id: " + id));
         log.info("Movie Id {} is found", movie.getId());
-        return toMovieResponse(movie);
+        return mapper.toMovieResponse(movie);
     }
 
     @Cacheable(key = "#genre", value = "MOVIE_GENRE_CACHE_LIST")
@@ -51,7 +53,7 @@ public class MovieService {
         log.info("Movie Genre {} all collected", genre);
         return  movies
                 .stream()
-                .map(movie -> toMovieResponse(movie))
+                .map(movie -> mapper.toMovieResponse(movie))
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +63,7 @@ public class MovieService {
         log.info("Movie Language {} all collected", language);
         return movies
                 .stream()
-                .map(movie -> toMovieResponse(movie))
+                .map(movie -> mapper.toMovieResponse(movie))
                 .collect(Collectors.toList());
     }
 
@@ -69,7 +71,7 @@ public class MovieService {
     public List<MovieResponse> findAllActiveMovies(String value){
         List<Movie> movies = movieRepo.findByIsActiveTrue();
         return movies.stream()
-                .map(movie -> toMovieResponse(movie))
+                .map(movie -> mapper.toMovieResponse(movie))
                 .collect(Collectors.toList());
     }
 
@@ -78,7 +80,7 @@ public class MovieService {
         List<Movie> movies = movieRepo.findByIsActiveFalse();
         return movies
                 .stream()
-                .map(movie -> toMovieResponse(movie))
+                .map(movie -> mapper.toMovieResponse(movie))
                 .collect(Collectors.toList());
     }
 
@@ -105,33 +107,33 @@ public class MovieService {
         movieRepo.save(movie);
     }
 
-    public MovieResponse toMovieResponse(Movie movie){
-        return MovieResponse
-                .builder()
-                .id(movie.getId())
-                .title(movie.getTitle())
-                .description(movie.getDescription())
-                .durationInMinutes(movie.getDurationInMinutes())
-                .releaseDate(movie.getReleaseDate())
-                .genre(movie.getGenre())
-                .language(movie.getLanguage())
-                .posterImageUrl(movie.getPosterImageUrl())
-                .trailerUrl(movie.getTrailerUrl())
-                .isActive(movie.getIsActive())
-                .build();
-    }
-
-    public Movie toMovieEntity(MovieRequest request){
-        return Movie
-                .builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .durationInMinutes(request.getDurationInMinutes())
-                .releaseDate(request.getReleaseDate())
-                .language(request.getLanguage())
-                .genre(request.getGenre())
-                .posterImageUrl(request.getPosterImageUrl())
-                .trailerUrl(request.getTrailerUrl())
-                .build();
-    }
+//    public MovieResponse toMovieResponse(Movie movie){
+//        return MovieResponse
+//                .builder()
+//                .id(movie.getId())
+//                .title(movie.getTitle())
+//                .description(movie.getDescription())
+//                .durationInMinutes(movie.getDurationInMinutes())
+//                .releaseDate(movie.getReleaseDate())
+//                .genre(movie.getGenre())
+//                .language(movie.getLanguage())
+//                .posterImageUrl(movie.getPosterImageUrl())
+//                .trailerUrl(movie.getTrailerUrl())
+//                .isActive(movie.getIsActive())
+//                .build();
+//    }
+//
+//    public Movie toMovieEntity(MovieRequest request){
+//        return Movie
+//                .builder()
+//                .title(request.getTitle())
+//                .description(request.getDescription())
+//                .durationInMinutes(request.getDurationInMinutes())
+//                .releaseDate(request.getReleaseDate())
+//                .language(request.getLanguage())
+//                .genre(request.getGenre())
+//                .posterImageUrl(request.getPosterImageUrl())
+//                .trailerUrl(request.getTrailerUrl())
+//                .build();
+//    }
 }

@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.component.MapperComponent;
 import com.example.dtos.CityResponse;
 import com.example.dtos.ScreenRequest;
 import com.example.dtos.ScreenResponse;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class ScreenService {
     private final ScreenRepo screenRepo;
     private final TheatreRepo theatreRepo;
+    private final MapperComponent mapper;
 
     @Transactional
     @Caching(evict = {
@@ -45,11 +47,11 @@ public class ScreenService {
             log.error("TheatreId {} not found", request.getTheatreId());
             return new TheatreNotFoundException("Theatre not found for Id: " + request.getTheatreId());
         });
-        Screen savedScreen = screenRepo.save(toScreenModel(request, theatre));
+        Screen savedScreen = screenRepo.save(mapper.toScreenModel(request, theatre));
         City city = theatre.getCity();
-        CityResponse cityResponse = toCityResponse(city);
-        TheatreResponse theatreResponse = toTheatreResponse(theatre, cityResponse);
-        return toScreenResponse(savedScreen, theatreResponse);
+        CityResponse cityResponse = mapper.toCityResponse(city);
+        TheatreResponse theatreResponse = mapper.toTheatreResponse(theatre, cityResponse);
+        return mapper.toScreenResponse(savedScreen, theatreResponse);
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +62,7 @@ public class ScreenService {
         });
         Theatre theatre = screen.getTheatre();
         City city = theatre.getCity();
-        return toScreenResponse(screen, toTheatreResponse(theatre, toCityResponse(city)));
+        return mapper.toScreenResponse(screen, mapper.toTheatreResponse(theatre, mapper.toCityResponse(city)));
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +71,7 @@ public class ScreenService {
         List<Screen> screens = screenRepo.findAllByName(name);
         return screens
                 .stream()
-                .map(screen -> toScreenResponse(screen, toTheatreResponse(screen.getTheatre(), toCityResponse(screen.getTheatre().getCity()))))
+                .map(screen -> mapper.toScreenResponse(screen, mapper.toTheatreResponse(screen.getTheatre(), mapper.toCityResponse(screen.getTheatre().getCity()))))
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +81,7 @@ public class ScreenService {
         List<Screen> screens = screenRepo.findAllByTheatreId(theatreId);
         return screens
                 .stream()
-                .map(screen -> toScreenResponse(screen, toTheatreResponse(screen.getTheatre(), toCityResponse(screen.getTheatre().getCity()))))
+                .map(screen -> mapper.toScreenResponse(screen, mapper.toTheatreResponse(screen.getTheatre(), mapper.toCityResponse(screen.getTheatre().getCity()))))
                 .collect(Collectors.toList());
     }
 
@@ -97,38 +99,38 @@ public class ScreenService {
         screenRepo.deleteByNameAndTheatreId(name, theatreId);
     }
 
-    public Screen toScreenModel(ScreenRequest request, Theatre theatre){
-        return Screen
-                .builder()
-                .name(request.getName())
-                .theatre(theatre)
-                .build();
-    }
-
-    public ScreenResponse toScreenResponse(Screen screen, TheatreResponse theatre){
-        return ScreenResponse
-                .builder()
-                .id(screen.getId())
-                .name(screen.getName())
-                .theatre(theatre)
-                .build();
-    }
-
-    public TheatreResponse toTheatreResponse(Theatre theatre, CityResponse cityResponse){
-        return TheatreResponse
-                .builder()
-                .name(theatre.getName())
-                .address(theatre.getAddress())
-                .city(cityResponse)
-                .build();
-    }
-
-    public CityResponse toCityResponse(City city){
-        return CityResponse
-                .builder()
-                .id(city.getId())
-                .name(city.getName())
-                .state(city.getState())
-                .build();
-    }
+//    public Screen toScreenModel(ScreenRequest request, Theatre theatre){
+//        return Screen
+//                .builder()
+//                .name(request.getName())
+//                .theatre(theatre)
+//                .build();
+//    }
+//
+//    public ScreenResponse toScreenResponse(Screen screen, TheatreResponse theatre){
+//        return ScreenResponse
+//                .builder()
+//                .id(screen.getId())
+//                .name(screen.getName())
+//                .theatre(theatre)
+//                .build();
+//    }
+//
+//    public TheatreResponse toTheatreResponse(Theatre theatre, CityResponse cityResponse){
+//        return TheatreResponse
+//                .builder()
+//                .name(theatre.getName())
+//                .address(theatre.getAddress())
+//                .city(cityResponse)
+//                .build();
+//    }
+//
+//    public CityResponse toCityResponse(City city){
+//        return CityResponse
+//                .builder()
+//                .id(city.getId())
+//                .name(city.getName())
+//                .state(city.getState())
+//                .build();
+//    }
 }
