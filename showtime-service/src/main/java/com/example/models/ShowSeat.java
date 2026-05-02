@@ -22,7 +22,7 @@ public class ShowSeat {
     private Status status;
 
 
-    private enum Status{
+    public enum Status{
         AVAILABLE,
         LOCKED,
         BOOKED

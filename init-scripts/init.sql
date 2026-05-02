@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS `theatre-service`;
+
+CREATE DATABASE IF NOT EXISTS `showtime-service`;

@@ -7,10 +7,7 @@ import com.example.service.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +25,10 @@ public class SeatController {
     @PostMapping("/list")
     public ResponseEntity<List<SeatResponse>> addMultipleSeats(@RequestBody ScreenSetupRequest request){
         return new ResponseEntity<>(seatService.addMultipleSeats(request), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/screenId/{screenId}")
+    public ResponseEntity<List<SeatResponse>> getAllSeatsByScreenId(@PathVariable("screenId") int screenId){
+        return new ResponseEntity<>(seatService.getSeatsByScreenId(screenId), HttpStatus.OK);
     }
 }

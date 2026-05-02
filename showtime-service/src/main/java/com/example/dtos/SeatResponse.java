@@ -1,5 +1,6 @@
 package com.example.dtos;
 
+import com.example.models.Seat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,13 +12,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SeatResponse {
     private Integer id;
-    private Integer seatId;
-    private Double price;
-    private Status status;
+    private String seatRow;
+    private Integer seatNumber;
+    private SeatType seatType;
+    private ScreenResponse screenResponse;
 
-    enum Status{
-        AVAILABLE,
-        LOCKED,
-        BOOKED
+
+    public enum SeatType{
+        VIP,
+        PREMIUM,
+        STANDARD
     }
 }

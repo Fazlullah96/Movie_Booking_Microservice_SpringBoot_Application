@@ -76,6 +76,14 @@ public class SeatService {
                 .collect(Collectors.toList());
     }
 
+    public List<SeatResponse> getSeatsByScreenId(int id){
+        List<Seat> seats = seatRepo.findAllByScreenId(id);
+        return seats
+                .stream()
+                .map(seat -> mapper.toSeatResponse(seat, mapper.toScreenResponse(seat.getScreen(), mapper.toTheatreResponse(seat.getScreen().getTheatre(), mapper.toCityResponse(seat.getScreen().getTheatre().getCity())))))
+                .collect(Collectors.toList());
+    }
+
 //    public SeatResponse toSeatResponse(Seat seat, ScreenResponse screenResponse){
 //        return SeatResponse
 //                .builder()

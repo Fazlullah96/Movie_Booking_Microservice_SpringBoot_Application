@@ -32,5 +32,4 @@ public class MapperComponent {
                 .isActive(show.getIsActive())
                 .build();
     }
-
 }
