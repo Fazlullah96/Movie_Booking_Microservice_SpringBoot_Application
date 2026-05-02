@@ -90,7 +90,7 @@ public class ShowService {
     @Transactional(readOnly = true)
     @Cacheable(value = "ACTIVE_SHOW_CACHE_LIST", key = "'ACTIVE'")
     public List<ShowResponse> getAllActiveShows(){
-        List<Show> shows = showRepo.findAllIsActiveTrue();
+        List<Show> shows = showRepo.findAllByIsActiveTrue();
         return shows
                 .stream()
                 .map(mapper::toShowResponse)
@@ -100,7 +100,7 @@ public class ShowService {
     @Transactional(readOnly = true)
     @Cacheable(value = "INACTIVE_SHOW_CACHE_LIST", key = "'INACTIVE'")
     public List<ShowResponse> getAllInActiveShows(){
-        List<Show> shows = showRepo.findAllIsActiveFalse();
+        List<Show> shows = showRepo.findAllByIsActiveFalse();
         return shows
                 .stream()
                 .map(mapper::toShowResponse)

@@ -14,6 +14,8 @@
         <module>api-gateway</module>
         <module>theatre-service</module>
         <module>showtime-service</module>
+        <module>booking-service</module>
+        <module>user-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
