@@ -17,8 +17,11 @@ public class ShowTimeController {
     private final ShowService showService;
 
     @PostMapping
-    public ResponseEntity<ShowResponse> addShow(@RequestBody ShowRequest request){
-        return new ResponseEntity<>(showService.addShow(request), HttpStatus.CREATED);
+    public ResponseEntity<ShowResponse> addShow(
+            @RequestBody ShowRequest request,
+            @RequestHeader("Authorization") String token
+    ){
+        return new ResponseEntity<>(showService.addShow(request, token), HttpStatus.CREATED);
     }
 
     @GetMapping("/{showId}")

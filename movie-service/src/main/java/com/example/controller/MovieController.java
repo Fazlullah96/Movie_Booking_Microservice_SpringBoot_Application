@@ -24,7 +24,7 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MovieResponse> getMovieById(@PathVariable int id){
-        return new ResponseEntity<>(movieService.getMovieById(id), HttpStatus.FOUND);
+        return new ResponseEntity<>(movieService.getMovieById(id), HttpStatus.OK);
     }
 
     @GetMapping("/genre/{genre}")
@@ -37,14 +37,14 @@ public class MovieController {
         return new ResponseEntity<>(movieService.getMovieByLanguages(language), HttpStatus.OK);
     }
 
-    @GetMapping("/active/{value}")
-    public ResponseEntity<List<MovieResponse>> getAllActiveMovies(@PathVariable String value){
-        return new ResponseEntity<>(movieService.findAllActiveMovies(value), HttpStatus.OK);
+    @GetMapping("/active")
+    public ResponseEntity<List<MovieResponse>> getAllActiveMovies(){
+        return new ResponseEntity<>(movieService.findAllActiveMovies(), HttpStatus.OK);
     }
 
-    @GetMapping("/inactive/{value}")
-    public ResponseEntity<List<MovieResponse>> getAllInActiveMovies(@PathVariable String value){
-        return new ResponseEntity<>(movieService.findAllNotActiveMovies(value), HttpStatus.OK);
+    @GetMapping("/inactive")
+    public ResponseEntity<List<MovieResponse>> getAllInActiveMovies(){
+        return new ResponseEntity<>(movieService.findAllNotActiveMovies(), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

@@ -67,17 +67,17 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(key = "#value", value = "MOVIE_ACTIVE_CACHE_LIST")
-    public List<MovieResponse> findAllActiveMovies(String value){
-        List<Movie> movies = movieRepo.findByIsActiveTrue();
+    @Cacheable(key = "'ACTIVE'", value = "MOVIE_ACTIVE_CACHE_LIST")
+    public List<MovieResponse> findAllActiveMovies(){
+        List<Movie> movies = movieRepo.findAllByIsActiveTrue();
         return movies.stream()
                 .map(movie -> mapper.toMovieResponse(movie))
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(key = "#value", value = "MOVIE_INACTIVE_CACHE_LIST")
-    public List<MovieResponse> findAllNotActiveMovies(String value){
-        List<Movie> movies = movieRepo.findByIsActiveFalse();
+    @Cacheable(key = "'INACTIVE'", value = "MOVIE_INACTIVE_CACHE_LIST")
+    public List<MovieResponse> findAllNotActiveMovies(){
+        List<Movie> movies = movieRepo.findAllByIsActiveFalse();
         return movies
                 .stream()
                 .map(movie -> mapper.toMovieResponse(movie))
@@ -106,6 +106,7 @@ public class MovieService {
         movie.setIsActive(value);
         movieRepo.save(movie);
     }
+
 
 //    public MovieResponse toMovieResponse(Movie movie){
 //        return MovieResponse

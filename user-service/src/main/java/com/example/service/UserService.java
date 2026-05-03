@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -89,7 +90,7 @@ public class UserService {
     }
 
     public TokenResponse login(LoginRequest request){
-        String tokenEndpoint = serverUrl + "/realm/" + realm + "/protocol/openid-connect/token";
+        String tokenEndpoint = serverUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -117,8 +118,9 @@ public class UserService {
             }else{
                 throw new InvalidCredentialsException("Username or Password is incorrect");
             }
-        }catch (Exception e){
-            throw new RuntimeException("Authentication failed");
+        }catch (HttpClientErrorException.Unauthorized e){
+            System.out.println("KEYCLOAK REJECTION REASON : " + e.getResponseBodyAsString());
+            throw new RuntimeException("Authentication failed " + e.getResponseBodyAsString());
         }
     }
 

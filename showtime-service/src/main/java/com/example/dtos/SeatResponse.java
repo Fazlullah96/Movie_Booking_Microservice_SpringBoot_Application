@@ -1,6 +1,5 @@
 package com.example.dtos;
 
-import com.example.models.Seat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

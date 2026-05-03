@@ -36,10 +36,10 @@ public class ShowService {
             @CacheEvict(value = "ACTIVE_SHOW_CACHE_LIST", allEntries = true),
             @CacheEvict(value = "INACTIVE_SHOW_CACHE_LIST", allEntries = true)
     })
-    public ShowResponse addShow(ShowRequest request){
-        MovieResponse movie = movieClient.getMovieById(request.getMovieId());
-        ScreenResponse screen = screenClient.getScreenById(request.getScreenId());
-        List<SeatResponse> physicalSeats = screenClient.getSeatsByScreenId(request.getScreenId());
+    public ShowResponse addShow(ShowRequest request, String token){
+        MovieResponse movie = movieClient.getMovieById(token, request.getMovieId());
+        ScreenResponse screen = screenClient.getScreenById(token, request.getScreenId());
+        List<SeatResponse> physicalSeats = screenClient.getSeatsByScreenId(token, request.getScreenId());
 
         Show show = mapper.toShowEntity(request);
 

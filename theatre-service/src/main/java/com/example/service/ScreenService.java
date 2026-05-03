@@ -99,6 +99,20 @@ public class ScreenService {
         screenRepo.deleteByNameAndTheatreId(name, theatreId);
     }
 
+    public List<ScreenResponse> getAllScreens(){
+        List<Screen> screens = screenRepo.findAll();
+        return screens
+                .stream()
+                .map(screen -> mapper.toScreenResponse(screen, mapper.toTheatreResponse(screen.getTheatre(), mapper.toCityResponse(screen.getTheatre().getCity()))))
+                .collect(Collectors.toList());
+    }
+
+    public ScreenResponse getScreenById(int id){
+        Screen screen = screenRepo.findById(id)
+                .orElseThrow(() -> new ScreenNotFoundException("Screen not found for Id: " + id));
+        return mapper.toScreenResponse(screen, mapper.toTheatreResponse(screen.getTheatre(), mapper.toCityResponse(screen.getTheatre().getCity())));
+    }
+
 //    public Screen toScreenModel(ScreenRequest request, Theatre theatre){
 //        return Screen
 //                .builder()

@@ -42,4 +42,14 @@ public class ScreenController {
         screenService.deleteScreenByTheatreId(name, theatreId);
         return new ResponseEntity<>("Screen " + name + " deleted in TheatreId: " + theatreId, HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ScreenResponse>> getAllScreens(){
+        return new ResponseEntity<>(screenService.getAllScreens(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ScreenResponse> getScreenById(@PathVariable int id){
+        return new ResponseEntity<>(screenService.getScreenById(id), HttpStatus.OK);
+    }
 }

@@ -8,6 +8,6 @@ import java.util.List;
 public interface MovieRepo extends JpaRepository<Movie, Integer> {
     List<Movie> findAllByGenre(String genre);
     List<Movie> findAllByLanguage(String language);
-    List<Movie> findByIsActiveTrue();
-    List<Movie> findByIsActiveFalse();
+    List<Movie> findAllByIsActiveTrue();
+    List<Movie> findAllByIsActiveFalse();
 }
