@@ -5,9 +5,12 @@ import com.example.clients.ScreenClient;
 import com.example.component.MapperComponent;
 import com.example.dtos.*;
 import com.example.exception.ShowNotFoundException;
+import com.example.exception.ShowSeatNotFoundException;
+import com.example.exception.ShowSeatStatusException;
 import com.example.models.Show;
 import com.example.models.ShowSeat;
 import com.example.repo.ShowRepo;
+import com.example.repo.ShowSeatRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ShowService {
     private final ShowRepo showRepo;
+    private final ShowSeatRepo showSeatRepo;
     private final MapperComponent mapper;
     private final MovieClient movieClient;
     private final ScreenClient screenClient;
@@ -59,9 +63,7 @@ public class ShowService {
             showSeats.add(showSeat);
         }
         show.setShowSeats(showSeats);
-
         Show savedShow = showRepo.save(show);
-
         return mapper.toShowResponse(savedShow);
     }
 
@@ -114,5 +116,32 @@ public class ShowService {
             return request.getBasePrice() * request.getPremiumMultiplier();
         }
         return request.getBasePrice();
+    }
+
+    public List<ShowSeatResponse> getAllShowSeatsByIds(List<Integer> ids){
+        List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(ids);
+        return showSeats
+                .stream()
+                .map(showSeat -> ShowSeatResponse.builder().id(showSeat.getId()).seatId(showSeat.getSeatId()).price(showSeat.getPrice()).status(String.valueOf(showSeat.getStatus())).build())
+                .collect(Collectors.toList());
+    }
+
+    public ShowSeatResponse updateShowSeatStatus(int showSheatId, String status){
+        ShowSeat showSeat = showSeatRepo.findById(showSheatId)
+                .orElseThrow(() -> new ShowSeatNotFoundException("ShowSeat not found for SHOWID: " + showSheatId));
+        if(showSeat.getStatus().name().equals("BOOKED")){
+            throw new ShowSeatStatusException("Seat: " + showSheatId + " is Already BOOKED by Another User");
+        } else if (showSeat.getStatus().name().equals("LOCKED")) {
+            throw new ShowSeatStatusException("Seat: " + showSheatId + " is Already LOCKED by Another User");
+        }else{
+            showSeat.setStatus(ShowSeat.Status.valueOf(status));
+        }
+        return ShowSeatResponse
+                .builder()
+                .id(showSeat.getId())
+                .seatId(showSeat.getSeatId())
+                .price(showSeat.getPrice())
+                .status(String.valueOf(showSeat.getStatus()))
+                .build();
     }
 }

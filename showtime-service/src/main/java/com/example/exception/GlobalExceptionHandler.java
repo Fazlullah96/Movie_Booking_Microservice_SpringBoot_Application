@@ -75,4 +75,52 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorMessage> serviceUnavailableException(
+            ServiceUnavailableException ex,
+            HttpServletRequest request
+    ){
+        ErrorMessage error = ErrorMessage
+                .builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .error(HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(ShowSeatNotFoundException.class)
+    public ResponseEntity<ErrorMessage> showSeatNotFoundException(
+            ShowSeatNotFoundException ex,
+            HttpServletRequest request
+    ){
+        ErrorMessage error = ErrorMessage
+                .builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ShowSeatStatusException.class)
+    public ResponseEntity<ErrorMessage> showSeatStatusException(
+            ShowSeatStatusException ex,
+            HttpServletRequest request
+    ){
+        ErrorMessage error = ErrorMessage
+                .builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

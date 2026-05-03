@@ -16,6 +16,7 @@ import com.example.repo.TheatreRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,10 @@ public class ScreenService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(key = "#request.theatreId", value = "SCREEN_THEATREID_CACHE_LIST"),
-            @CacheEvict(key = "#result.name", value = "SCREEN_NAME_CACHE_LIST")
+            @CacheEvict(key = "#result.name", value = "SCREEN_NAME_CACHE_LIST"),
+            @CacheEvict(value = "SCREEN_ALL_CACHE_LIST", allEntries = true)
+    }, put = {
+            @CachePut(value = "SCREEN_CACHE", key = "#result.id")
     })
     public ScreenResponse addScreen(ScreenRequest request){
         boolean isScreenNameExist = screenRepo.existsByNameAndTheatreId(request.getName(), request.getTheatreId());
@@ -88,7 +92,9 @@ public class ScreenService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(key = "#theatreId", value = "SCREEN_THEATREID_CACHE_LIST"),
-            @CacheEvict(key = "#name", value = "SCREEN_NAME_CACHE_LIST")
+            @CacheEvict(key = "#name", value = "SCREEN_NAME_CACHE_LIST"),
+            @CacheEvict(value = "SCREEN_CACHE", allEntries = true),
+            @CacheEvict(value = "SCREEN_ALL_CACHE_LIST", allEntries = true)
     })
     public void deleteScreenByTheatreId(String name, int theatreId){
         boolean isScreenAndTheatreIdExist = screenRepo.existsByNameAndTheatreId(name, theatreId);
@@ -99,6 +105,8 @@ public class ScreenService {
         screenRepo.deleteByNameAndTheatreId(name, theatreId);
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "SCREEN_ALL_CACHE_LIST", key = "'ALL'")
     public List<ScreenResponse> getAllScreens(){
         List<Screen> screens = screenRepo.findAll();
         return screens
@@ -107,6 +115,8 @@ public class ScreenService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "SCREEN_CACHE", key = "#id")
     public ScreenResponse getScreenById(int id){
         Screen screen = screenRepo.findById(id)
                 .orElseThrow(() -> new ScreenNotFoundException("Screen not found for Id: " + id));

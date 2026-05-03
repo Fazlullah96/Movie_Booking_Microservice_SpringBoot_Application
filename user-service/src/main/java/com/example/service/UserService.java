@@ -8,6 +8,7 @@ import com.example.dtos.UserRegistration;
 import com.example.dtos.UserResponse;
 import com.example.exception.InvalidCredentialsException;
 import com.example.exception.KeycloakRegistrationFailedException;
+import com.example.exception.UserNotFoundException;
 import com.example.models.User;
 import com.example.repo.UserRepo;
 import jakarta.ws.rs.core.Response;
@@ -18,11 +19,13 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -129,5 +132,20 @@ public class UserService {
         private String access_token;
         private String refresh_token;
         private Integer expires_in;
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = "USER_CACHE", key = "#userId")
+    public UserResponse getUserById(String userId){
+        User user = userRepo.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found for UserId" + userId));
+        return UserResponse
+                .builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
     }
 }

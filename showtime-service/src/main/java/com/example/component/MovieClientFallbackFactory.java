@@ -3,6 +3,7 @@ package com.example.component;
 import com.example.clients.MovieClient;
 import com.example.dtos.MovieResponse;
 import com.example.exception.MovieNotFoundException;
+import com.example.exception.ServiceUnavailableException;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -20,7 +21,7 @@ public class MovieClientFallbackFactory implements FallbackFactory<MovieClient> 
                 if(cause instanceof FeignException.NotFound){
                     throw new MovieNotFoundException("Movie not found for MovieId: " + id);
                 }
-                throw new RuntimeException("Service not available.....");
+                throw new ServiceUnavailableException("Service not available.....");
             }
         };
     }

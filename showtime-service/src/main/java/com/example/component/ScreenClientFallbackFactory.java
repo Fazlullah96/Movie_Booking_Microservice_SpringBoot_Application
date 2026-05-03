@@ -4,6 +4,7 @@ import com.example.clients.ScreenClient;
 import com.example.dtos.ScreenResponse;
 import com.example.dtos.SeatResponse;
 import com.example.exception.ScreenNotFoundException;
+import com.example.exception.ServiceUnavailableException;
 import feign.FeignException;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -20,12 +21,12 @@ public class ScreenClientFallbackFactory implements FallbackFactory<ScreenClient
                 if(cause instanceof FeignException.NotFound){
                     throw new ScreenNotFoundException("Screen Not Found for ScreenId: " + id);
                 }
-                throw new RuntimeException("Service Not Available......");
+                throw new ServiceUnavailableException("Service Not Available......");
             }
 
             @Override
             public List<SeatResponse> getSeatsByScreenId(String token, int screenId) {
-                throw new RuntimeException("Service Not Available.....");
+                throw new ServiceUnavailableException("Service Not Available.....");
             }
         };
     }

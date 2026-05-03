@@ -22,7 +22,7 @@ public class Booking {
     @Column(nullable = false, unique = true)
     private String bookingReference;
     @Column(nullable = false)
-    private Integer userId;
+    private String userId;
     @Column(nullable = false)
     private Integer showId;
     private Double totalAmount;
@@ -35,7 +35,7 @@ public class Booking {
             fetch = FetchType.LAZY,
             orphanRemoval = true
     )
-    private List<BookingSeat> bookingSeats;
+    private List<BookingSeat> bookedSeats;
 
     public enum Status{
         PENDING,

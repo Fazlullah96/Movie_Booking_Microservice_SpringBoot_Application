@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dtos.ShowRequest;
 import com.example.dtos.ShowResponse;
+import com.example.dtos.ShowSeatResponse;
 import com.example.service.ShowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,15 @@ public class ShowTimeController {
     @GetMapping("/inactive")
     public ResponseEntity<List<ShowResponse>> getAllInActive(){
         return new ResponseEntity<>(showService.getAllInActiveShows(), HttpStatus.OK);
+    }
+
+    @GetMapping("/showseat")
+    public ResponseEntity<List<ShowSeatResponse>> getAllShowSeatsByIds(@RequestParam List<Integer> ids){
+        return new ResponseEntity<>(showService.getAllShowSeatsByIds(ids), HttpStatus.OK);
+    }
+
+    @PutMapping("/showseat/status/update/{showSeatId}/{status}")
+    public ResponseEntity<ShowSeatResponse> updateShowSeatStatus(@PathVariable int showSeatId, @PathVariable String status){
+        return new ResponseEntity<>(showService.updateShowSeatStatus(showSeatId, status), HttpStatus.OK);
     }
 }

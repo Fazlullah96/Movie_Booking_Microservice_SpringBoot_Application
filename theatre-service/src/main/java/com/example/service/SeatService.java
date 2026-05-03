@@ -12,6 +12,9 @@ import com.example.repo.ScreenRepo;
 import com.example.repo.SeatRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,9 @@ public class SeatService {
     private final MapperComponent mapper;
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "SEATS_SCREENID_CACHE_LIST", allEntries = true)
+    })
     public SeatResponse addSeat(SeatRequest request){
         boolean isSeatRowSeatNumberScreenIdExists = seatRepo.existsBySeatRowAndSeatNumberAndScreenId(request.getSeatRow(), request.getSeatNumber(), request.getScreenId());
         if(isSeatRowSeatNumberScreenIdExists){
@@ -76,6 +82,8 @@ public class SeatService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "SEATS_SCREENID_CACHE_LIST", key = "#id")
     public List<SeatResponse> getSeatsByScreenId(int id){
         List<Seat> seats = seatRepo.findAllByScreenId(id);
         return seats

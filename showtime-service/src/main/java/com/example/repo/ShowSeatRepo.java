@@ -3,5 +3,8 @@ package com.example.repo;
 import com.example.models.ShowSeat;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ShowSeatRepo extends JpaRepository<ShowSeat, Integer> {
+    List<ShowSeat> findAllByIdIn(List<Integer> ids);
 }

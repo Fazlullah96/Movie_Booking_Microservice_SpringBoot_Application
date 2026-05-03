@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingRequest {
-    private String userId;
-    private Integer showId;
-    private List<Integer> showSeatIds;
+public class UserResponse {
+    private String id;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
 }
