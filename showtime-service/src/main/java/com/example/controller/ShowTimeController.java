@@ -50,8 +50,13 @@ public class ShowTimeController {
         return new ResponseEntity<>(showService.getAllShowSeatsByIds(ids), HttpStatus.OK);
     }
 
-    @PutMapping("/showseat/status/update/{showSeatId}/{status}")
-    public ResponseEntity<ShowSeatResponse> updateShowSeatStatus(@PathVariable int showSeatId, @PathVariable String status){
-        return new ResponseEntity<>(showService.updateShowSeatStatus(showSeatId, status), HttpStatus.OK);
+    @PutMapping("/showseat/status/update/locked")
+    public ResponseEntity<List<ShowSeatResponse>> updateShowSeatStatus(@RequestParam List<Integer> showSeatIds){
+        return new ResponseEntity<>(showService.updateShowSeatStatusToLocked(showSeatIds), HttpStatus.OK);
+    }
+
+    @PutMapping("/showseat/status/update/revert")
+    public ResponseEntity<List<ShowSeatResponse>> revertUpdatedStatus(@RequestParam List<Integer> showSeatIds){
+        return new ResponseEntity<>(showService.revertUpdatedStatusAvailable(showSeatIds), HttpStatus.OK);
     }
 }

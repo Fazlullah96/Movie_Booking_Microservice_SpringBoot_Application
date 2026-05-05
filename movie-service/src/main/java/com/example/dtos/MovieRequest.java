@@ -18,6 +18,8 @@ public class MovieRequest {
     private String title;
     @NotBlank(message = "Description Cannot be Empty")
     private String description;
+    @NotBlank(message = "Director cannot be Empty")
+    private String director;
     @NotNull(message = "Duration in Minutes Cannot be Empty")
     private Integer durationInMinutes;
     @NotNull(message = "Release Date Cannot be Empty")

@@ -22,10 +22,15 @@ public interface ShowClient {
             @RequestParam("ids") List<Integer> showSeatIds
     );
 
-    @PutMapping("/api/showtime/showseat/status/update/{showSeatId}/{status}")
-    ShowSeatResponse updateShowSeatStatus(
+    @PutMapping("/api/showtime/showseat/status/update/locked")
+    List<ShowSeatResponse> updateShowSeatStatus(
             @RequestHeader("Authorization") String token,
-            @PathVariable("showSeatId") int showSeatId,
-            @PathVariable("status") String status
+            @RequestParam("showSeatIds") List<Integer> showSeatIds
+    );
+
+    @PutMapping("/api/showtime/showseat/status/update/revert")
+    List<ShowSeatResponse> revertUpdatedShowSeatStatus(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("showSeatIds") List<Integer> showSeatIds
     );
 }

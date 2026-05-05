@@ -21,12 +21,12 @@ public class ScreenClientFallbackFactory implements FallbackFactory<ScreenClient
                 if(cause instanceof FeignException.NotFound){
                     throw new ScreenNotFoundException("Screen Not Found for ScreenId: " + id);
                 }
-                throw new ServiceUnavailableException("Service Not Available......");
+                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
             }
 
             @Override
             public List<SeatResponse> getSeatsByScreenId(String token, int screenId) {
-                throw new ServiceUnavailableException("Service Not Available.....");
+                throw new ServiceUnavailableException("SERVICE UNAVAILABLE.....");
             }
         };
     }

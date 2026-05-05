@@ -22,6 +22,8 @@ public class Movie {
     private Integer id;
     @NotBlank(message = "Title should not be Empty")
     private String title;
+    @NotBlank(message = "Director show not be Empty")
+    private String director;
     @NotBlank(message = "Description should not be Empty")
     private String description;
     @NotNull(message = "Duration of the movie cannot be Empty")

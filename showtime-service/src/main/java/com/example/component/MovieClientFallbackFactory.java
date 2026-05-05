@@ -21,7 +21,7 @@ public class MovieClientFallbackFactory implements FallbackFactory<MovieClient> 
                 if(cause instanceof FeignException.NotFound){
                     throw new MovieNotFoundException("Movie not found for MovieId: " + id);
                 }
-                throw new ServiceUnavailableException("Service not available.....");
+                throw new ServiceUnavailableException("SERVICE UNAVAILABLE.....");
             }
         };
     }

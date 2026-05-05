@@ -2,7 +2,6 @@ package com.example.service;
 
 import com.example.clients.ShowClient;
 import com.example.clients.UserClient;
-import com.example.config.RedisTemplate;
 import com.example.dtos.*;
 import com.example.exceptions.SeatAlreadyLockedException;
 import com.example.model.Booking;
@@ -34,6 +33,7 @@ public class BookingService {
         UserResponse user = userClient.getUserByUserId(token, request.getUserId());
         List<Integer> requestShowSeatIds = request.getShowSeatIds();
         List<String> successfullyLockedSeats = new ArrayList<>();
+        List<Integer> successfullyLockedSeatsInt = new ArrayList<>();
         String LOCKED_VALUE = "LOCKED_BY_USER_" + request.getUserId();
 
         try{
@@ -44,12 +44,14 @@ public class BookingService {
                 );
 
                 if(Boolean.TRUE.equals(acquired)){
-                    ShowSeatResponse showSeatResponse = showClient.updateShowSeatStatus(token, seatId, "LOCKED");
                     successfullyLockedSeats.add(LOCKED_KEY);
+                    successfullyLockedSeatsInt.add(seatId);
                 }else{
                     throw new SeatAlreadyLockedException("SeatId: " + seatId + " already locked by another user. Please try different seat");
                 }
             }
+
+            List<ShowSeatResponse> showSeatResponses = showClient.updateShowSeatStatus(token, successfullyLockedSeatsInt);
 
             List<ShowSeatResponse> showSeats = showClient.getAllShowSeatByIds(token, requestShowSeatIds);
 
@@ -110,6 +112,14 @@ public class BookingService {
         }catch (Exception e){
             for(String key : successfullyLockedSeats){
                 redisTemplate.delete(key);
+            }
+            if(!successfullyLockedSeatsInt.isEmpty()){
+                try {
+                    List<ShowSeatResponse> showSeatResponseList = showClient.revertUpdatedShowSeatStatus(token, successfullyLockedSeatsInt);
+                    log.info("SUCCESSFULLY REVERTED LOCKED SHOWSEATS TO AVAILABLE");
+                }catch (Exception revertEX){
+                    log.error("CRITICAL: Failed to revert seats in Showtime Service! Seats {} are stuck.", successfullyLockedSeatsInt, revertEX);
+                }
             }
             throw e;
         }

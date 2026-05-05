@@ -5,6 +5,7 @@ import com.example.dtos.ShowResponse;
 import com.example.dtos.ShowSeatResponse;
 import com.example.exceptions.ServiceUnavailableException;
 import com.example.exceptions.ShowNotFoundException;
+import com.example.exceptions.ShowSeatStatusException;
 import feign.FeignException;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,22 @@ public class ShowClientFallbackFactory implements FallbackFactory<ShowClient> {
 
             @Override
             public List<ShowSeatResponse> getAllShowSeatByIds(String token, List<Integer> showSeatIds) {
+                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
+            }
+
+            @Override
+            public List<ShowSeatResponse> updateShowSeatStatus(String token, List<Integer> showSeatIds) {
+                if(cause instanceof FeignException.BadRequest){
+                    throw new ShowSeatStatusException("ShowSeatId: " + showSeatIds + " bad status Update");
+                }
+                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
+            }
+
+            @Override
+            public List<ShowSeatResponse> revertUpdatedShowSeatStatus(String token, List<Integer> showSeatIds) {
+                if(cause instanceof FeignException.BadRequest){
+                    throw new ShowSeatStatusException("ShowSeatId: " + showSeatIds + " bad status Update");
+                }
                 throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
             }
         };

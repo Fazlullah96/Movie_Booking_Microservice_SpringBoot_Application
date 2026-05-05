@@ -53,9 +53,19 @@ public class MovieController {
         return new ResponseEntity<>("Movie deleted successfully....", HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}/{value}")
+    @PutMapping("/status/update/{id}/{value}")
     public ResponseEntity<String> updateMovie(@PathVariable int id, @PathVariable boolean value){
         movieService.updateIsActive(id, value);
         return new ResponseEntity<>("Movie updated successfully for movieId: " + id, HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<MovieResponse>> getAllMovies(){
+        return new ResponseEntity<>(movieService.getAllMovies(), HttpStatus.OK);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<MovieResponse> updateMovie(@PathVariable("id") int id, @Valid @RequestBody MovieRequest request){
+        return new ResponseEntity<>(movieService.updateMovie(id, request), HttpStatus.OK);
     }
 }

@@ -126,22 +126,45 @@ public class ShowService {
                 .collect(Collectors.toList());
     }
 
-    public ShowSeatResponse updateShowSeatStatus(int showSheatId, String status){
-        ShowSeat showSeat = showSeatRepo.findById(showSheatId)
-                .orElseThrow(() -> new ShowSeatNotFoundException("ShowSeat not found for SHOWID: " + showSheatId));
-        if(showSeat.getStatus().name().equals("BOOKED")){
-            throw new ShowSeatStatusException("Seat: " + showSheatId + " is Already BOOKED by Another User");
-        } else if (showSeat.getStatus().name().equals("LOCKED")) {
-            throw new ShowSeatStatusException("Seat: " + showSheatId + " is Already LOCKED by Another User");
-        }else{
-            showSeat.setStatus(ShowSeat.Status.valueOf(status));
+    public List<ShowSeatResponse> updateShowSeatStatusToLocked(List<Integer> showSheatIds){
+        List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(showSheatIds);
+        for(ShowSeat seat : showSeats){
+            if(seat.getStatus().name().equals("BOOKED")){
+                throw new ShowSeatStatusException("Seat: " + seat.getSeatId() + " is Already BOOKED by Another User");
+            } else if (seat.getStatus().name().equals("LOCKED")) {
+                throw new ShowSeatStatusException("Seat: " + seat.getSeatId() + " is Already LOCKED by Another User");
+            }else{
+                seat.setStatus(ShowSeat.Status.valueOf("LOCKED"));
+            }
         }
-        return ShowSeatResponse
-                .builder()
-                .id(showSeat.getId())
-                .seatId(showSeat.getSeatId())
-                .price(showSeat.getPrice())
-                .status(String.valueOf(showSeat.getStatus()))
-                .build();
+        List<ShowSeat> seats = showSeatRepo.saveAll(showSeats);
+        return seats
+                .stream()
+                .map(seat -> ShowSeatResponse
+                        .builder()
+                        .id(seat.getId())
+                        .seatId(seat.getSeatId())
+                        .price(seat.getPrice())
+                        .status(String.valueOf(seat.getStatus()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ShowSeatResponse> revertUpdatedStatusAvailable(List<Integer> showSeatIds){
+        List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(showSeatIds);
+        for(ShowSeat seat : showSeats){
+            seat.setStatus(ShowSeat.Status.valueOf("AVAILABLE"));
+        }
+        List<ShowSeat> savedShowSeats = showSeatRepo.saveAll(showSeats);
+        return savedShowSeats
+                .stream()
+                .map(seat -> ShowSeatResponse
+                        .builder()
+                        .id(seat.getId())
+                        .seatId(seat.getSeatId())
+                        .price(seat.getPrice())
+                        .status(String.valueOf(seat.getStatus()))
+                        .build())
+                .collect(Collectors.toList());
     }
 }

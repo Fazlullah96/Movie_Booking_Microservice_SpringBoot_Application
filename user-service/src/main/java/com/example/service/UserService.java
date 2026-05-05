@@ -135,10 +135,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "USER_CACHE", key = "#userId")
-    public UserResponse getUserById(String userId){
-        User user = userRepo.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found for UserId" + userId));
+    @Cacheable(value = "USER_CACHE", key = "#id")
+    public UserResponse getUserById(String id){
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found for UserId" + id));
         return UserResponse
                 .builder()
                 .id(user.getId())

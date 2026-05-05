@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +30,8 @@ public class MovieService {
             @CacheEvict(key = "#result.genre", value = "MOVIE_GENRE_CACHE_LIST"),
             @CacheEvict(key = "#result.language", value = "MOVIE_LANGUAGE_CACHE_LIST"),
             @CacheEvict(value = "MOVIE_ACTIVE_CACHE_LIST", allEntries = true),
-            @CacheEvict(value = "MOVIE_INACTIVE_CACHE_LIST", allEntries = true)
+            @CacheEvict(value = "MOVIE_INACTIVE_CACHE_LIST", allEntries = true),
+            @CacheEvict(value = "MOVIE_CACHE_LIST", allEntries = true)
     })
     public MovieResponse addMovie(MovieRequest request){
         Movie movie = mapper.toMovieEntity(request);
@@ -105,6 +107,25 @@ public class MovieService {
         Movie movie = movieRepo.findById(id).orElseThrow(() -> new MovieNotFoundException("Movie Not Found for Id: " + id));
         movie.setIsActive(value);
         movieRepo.save(movie);
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = "MOVIE_CACHE_LIST", key = "'ALL'")
+    public List<MovieResponse> getAllMovies(){
+        List<Movie> movies = movieRepo.findAll();
+        return movies
+                .stream()
+                .map(mapper::toMovieResponse)
+                .collect(Collectors.toList());
+    }
+
+    public MovieResponse updateMovie(int id, MovieRequest request){
+        Movie movie = movieRepo.findById(id)
+                .orElseThrow(() -> new MovieNotFoundException("Movie not found for MovieId: " + id));
+        Movie updatedMovie = mapper.toMovieEntity(request);
+        updatedMovie.setIsActive(true);
+        Movie savedMovie = movieRepo.save(updatedMovie);
+        return mapper.toMovieResponse(savedMovie);
     }
 
 
