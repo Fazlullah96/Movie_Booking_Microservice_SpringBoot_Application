@@ -26,6 +26,7 @@ public class Booking {
     @Column(nullable = false)
     private Integer showId;
     private Double totalAmount;
+    @Enumerated(EnumType.STRING)
     private Status bookingStatus;
     private LocalDateTime bookingTime;
 
@@ -40,6 +41,7 @@ public class Booking {
     public enum Status{
         PENDING,
         SUCCESS,
-        CANCELLED
+        CANCELLED,
+        AWAITING_PAYMENT
     }
 }

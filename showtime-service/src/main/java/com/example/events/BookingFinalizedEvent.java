@@ -11,7 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingCreatedEvent {
+public class BookingFinalizedEvent {
     private String bookingReference;
     private List<Integer> showSeatIds;
+    private String finalStatus;
 }

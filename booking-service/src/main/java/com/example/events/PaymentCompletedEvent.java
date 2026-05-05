@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingCreatedEvent {
+public class PaymentCompletedEvent {
     private String bookingReference;
-    private List<Integer> showSeatIds;
+    private Integer paymentId;
+    private String transactionId;
+    private String status; // "SUCCESS" or "FAILED"
+    private String message;
 }

@@ -69,7 +69,7 @@ public class ShowService {
 
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "SHOW_CACHE", key = "#result.id")
+    @Cacheable(value = "SHOW_CACHE", key = "#id")
     public ShowResponse getShowById(int id){
         Show show = showRepo.findById(id)
                 .orElseThrow(() -> new ShowNotFoundException("Show not found for Id: "+ id));
@@ -147,6 +147,19 @@ public class ShowService {
                         .price(seat.getPrice())
                         .status(String.valueOf(seat.getStatus()))
                         .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ShowSeatResponse> updateShowSeatStatusToBooked(List<Integer> showSeatIds){
+        List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(showSeatIds);
+        for(ShowSeat seat : showSeats){
+            seat.setStatus(ShowSeat.Status.valueOf("BOOKED"));
+        }
+        List<ShowSeat> savedShowSeats = showSeatRepo.saveAll(showSeats);
+        return savedShowSeats
+                .stream()
+                .map(showSeat -> ShowSeatResponse
+                        .builder().id(showSeat.getId()).seatId(showSeat.getSeatId()).price(showSeat.getPrice()).status(String.valueOf(showSeat.getStatus())).build())
                 .collect(Collectors.toList());
     }
 

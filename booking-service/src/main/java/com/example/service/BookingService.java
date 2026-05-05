@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.clients.ShowClient;
 import com.example.clients.UserClient;
 import com.example.dtos.*;
+import com.example.events.BookingCreatedEvent;
 import com.example.exceptions.SeatAlreadyLockedException;
 import com.example.model.Booking;
 import com.example.model.BookingSeat;
@@ -10,6 +11,7 @@ import com.example.repo.BookingRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,30 +30,29 @@ public class BookingService {
     private final ShowClient showClient;
     private final StringRedisTemplate redisTemplate;
 
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private static final String BOOKING_TOPIC = "booking-events";
+
 
     public BookingResponse createBooking(String token, BookingRequest request){
         UserResponse user = userClient.getUserByUserId(token, request.getUserId());
         List<Integer> requestShowSeatIds = request.getShowSeatIds();
         List<String> successfullyLockedSeats = new ArrayList<>();
-        List<Integer> successfullyLockedSeatsInt = new ArrayList<>();
         String LOCKED_VALUE = "LOCKED_BY_USER_" + request.getUserId();
 
         try{
             for(Integer seatId : requestShowSeatIds){
                 String LOCKED_KEY = "LOCK:SEAT:" + seatId;
                 Boolean acquired = redisTemplate.opsForValue().setIfAbsent(
-                        LOCKED_VALUE, LOCKED_KEY, 10, TimeUnit.MINUTES
+                        LOCKED_KEY, LOCKED_VALUE, 10, TimeUnit.MINUTES
                 );
 
                 if(Boolean.TRUE.equals(acquired)){
                     successfullyLockedSeats.add(LOCKED_KEY);
-                    successfullyLockedSeatsInt.add(seatId);
                 }else{
                     throw new SeatAlreadyLockedException("SeatId: " + seatId + " already locked by another user. Please try different seat");
                 }
             }
-
-            List<ShowSeatResponse> showSeatResponses = showClient.updateShowSeatStatus(token, successfullyLockedSeatsInt);
 
             List<ShowSeatResponse> showSeats = showClient.getAllShowSeatByIds(token, requestShowSeatIds);
 
@@ -92,6 +93,14 @@ public class BookingService {
                     .collect(Collectors.toList());
             booking.setBookedSeats(bookingSeats);
             Booking savedBooking = bookingRepo.save(booking);
+
+            BookingCreatedEvent event = BookingCreatedEvent
+                    .builder()
+                    .bookingReference(savedBooking.getBookingReference())
+                    .showSeatIds(requestShowSeatIds)
+                    .build();
+
+            kafkaTemplate.send(BOOKING_TOPIC, savedBooking.getBookingReference(), event);
             return BookingResponse
                     .builder()
                     .bookingId(savedBooking.getId())
@@ -112,14 +121,6 @@ public class BookingService {
         }catch (Exception e){
             for(String key : successfullyLockedSeats){
                 redisTemplate.delete(key);
-            }
-            if(!successfullyLockedSeatsInt.isEmpty()){
-                try {
-                    List<ShowSeatResponse> showSeatResponseList = showClient.revertUpdatedShowSeatStatus(token, successfullyLockedSeatsInt);
-                    log.info("SUCCESSFULLY REVERTED LOCKED SHOWSEATS TO AVAILABLE");
-                }catch (Exception revertEX){
-                    log.error("CRITICAL: Failed to revert seats in Showtime Service! Seats {} are stuck.", successfullyLockedSeatsInt, revertEX);
-                }
             }
             throw e;
         }

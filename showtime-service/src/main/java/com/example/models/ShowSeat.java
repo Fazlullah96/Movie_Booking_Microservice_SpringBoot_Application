@@ -19,6 +19,7 @@ public class ShowSeat {
     private Show show;
     private Integer seatId;
     private Double price;
+    @Enumerated(EnumType.STRING)
     private Status status;
 
 

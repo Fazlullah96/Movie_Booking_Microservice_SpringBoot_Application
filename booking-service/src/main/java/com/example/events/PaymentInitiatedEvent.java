@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingCreatedEvent {
+public class PaymentInitiatedEvent {
     private String bookingReference;
-    private List<Integer> showSeatIds;
+    private String userId;
+    private Double amount;
+    private String paymentMethod;
 }
