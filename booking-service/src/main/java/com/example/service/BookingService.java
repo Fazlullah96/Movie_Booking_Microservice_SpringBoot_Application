@@ -8,7 +8,10 @@ import com.example.exceptions.BookingNotFoundException;
 import com.example.exceptions.SeatAlreadyLockedException;
 import com.example.model.Booking;
 import com.example.model.BookingSeat;
+import com.example.model.OutBoxEvent;
 import com.example.repo.BookingRepo;
+import com.example.repo.OutBoxEventRepo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -31,9 +34,11 @@ public class BookingService {
     private final UserClient userClient;
     private final ShowClient showClient;
     private final StringRedisTemplate redisTemplate;
+    private final OutBoxEventRepo outBoxEventRepo;
+    private final ObjectMapper objectMapper;
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private static final String BOOKING_TOPIC = "booking-events";
+//    private final KafkaTemplate<String, Object> kafkaTemplate;
+//    private static final String BOOKING_TOPIC = "booking-events";
 
     @Transactional
     public BookingResponse createBooking(String token, BookingRequest request){
@@ -43,8 +48,8 @@ public class BookingService {
         String LOCKED_VALUE = "LOCKED_BY_USER_" + request.getUserId();
 
         try{
-            for(Integer seatId : requestShowSeatIds){
-                String LOCKED_KEY = "LOCK:SEAT:" + seatId;
+            for(Integer showSeatId : requestShowSeatIds){
+                String LOCKED_KEY = "LOCK:SEAT:" + showSeatId;
                 Boolean acquired = redisTemplate.opsForValue().setIfAbsent(
                         LOCKED_KEY, LOCKED_VALUE, 10, TimeUnit.MINUTES
                 );
@@ -52,7 +57,7 @@ public class BookingService {
                 if(Boolean.TRUE.equals(acquired)){
                     successfullyLockedSeats.add(LOCKED_KEY);
                 }else{
-                    throw new SeatAlreadyLockedException("SeatId: " + seatId + " already locked by another user. Please try different seat");
+                    throw new SeatAlreadyLockedException("SeatId: " + showSeatId + " already locked by another user. Please try different seat");
                 }
             }
 
@@ -102,8 +107,15 @@ public class BookingService {
                     .bookingReference(savedBooking.getBookingReference())
                     .showSeatIds(requestShowSeatIds)
                     .build();
-
-            kafkaTemplate.send(BOOKING_TOPIC, savedBooking.getBookingReference(), event);
+            OutBoxEvent outBoxEvent = OutBoxEvent
+                    .builder()
+                    .aggregateType("BOOKING")
+                    .aggregateId(savedBooking.getBookingReference())
+                    .topic("booking-events")
+                    .status(false)
+                    .payload(objectMapper.writeValueAsString(event))
+                    .build();
+            outBoxEventRepo.save(outBoxEvent);
             return BookingResponse
                     .builder()
                     .bookingId(savedBooking.getId())

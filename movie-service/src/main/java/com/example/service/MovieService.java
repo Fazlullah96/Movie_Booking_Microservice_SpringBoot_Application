@@ -3,7 +3,7 @@ package com.example.service;
 import com.example.component.MapperComponent;
 import com.example.dtos.MovieRequest;
 import com.example.dtos.MovieResponse;
-import com.example.exception.MovieNotFoundException;
+import com.example.exceptions.MovieNotFoundException;
 import com.example.model.Movie;
 import com.example.repo.MovieRepo;
 import lombok.RequiredArgsConstructor;

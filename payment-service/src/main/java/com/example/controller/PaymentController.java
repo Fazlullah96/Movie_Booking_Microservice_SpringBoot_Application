@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.dtos.PaymentRequest;
 import com.example.dtos.PaymentResponse;
 import com.example.service.PaymentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> initiatePayment(
             @RequestHeader("Authorization") String token,
             @RequestBody PaymentRequest request
-            ){
+            ) throws JsonProcessingException {
         return new ResponseEntity<>(paymentService.initiatePayment(token, request), HttpStatus.CREATED);
     }
 }

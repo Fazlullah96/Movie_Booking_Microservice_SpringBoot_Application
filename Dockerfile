@@ -7,6 +7,8 @@ COPY api-gateway/pom.xml api-gateway/
 COPY movie-service/pom.xml movie-service/
 COPY theatre-service/pom.xml theatre-service/
 COPY showtime-service/pom.xml showtime-service/
+COPY booking-service/pom.xml booking-service/
+COPY payment-service/pom.xml payment-service/
 
 RUN mvn dependency:go-offline -B
 
@@ -15,6 +17,8 @@ COPY api-gateway/src api-gateway/src
 COPY movie-service/src movie-service/src
 COPY theatre-service/src theatre-service/src
 COPY showtime-service/src showtime-service/src
+COPY booking-service/src booking-service/src
+COPY payment-service/src payment-service/src
 
 RUN mvn clean package -DskipTests
 

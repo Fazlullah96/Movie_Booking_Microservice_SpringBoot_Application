@@ -1,17 +1,14 @@
 package com.example.component;
 
 import com.example.events.BookingFinalizedEvent;
-import com.example.exception.ShowNotFoundException;
+import com.example.exceptions.ShowNotFoundException;
 import com.example.models.Show;
-import com.example.models.ShowSeat;
 import com.example.repo.ShowRepo;
 import com.example.repo.ShowSeatRepo;
 import com.example.service.ShowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor

@@ -1,3 +1,5 @@
 CREATE DATABASE IF NOT EXISTS `theatre-service`;
-
 CREATE DATABASE IF NOT EXISTS `showtime-service`;
+CREATE DATABASE IF NOT EXISTS `user-service`
+CREATE DATABASE IF NOT EXISTS `booking-service`
+CREATE DATABASE IF NOT EXISTS `payment-service`

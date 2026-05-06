@@ -6,11 +6,14 @@ import com.example.dtos.PaymentRequest;
 import com.example.dtos.PaymentResponse;
 import com.example.events.PaymentCompletedEvent;
 import com.example.exceptions.BookingStatusException;
+import com.example.model.OutBoxEvent;
 import com.example.model.Payment;
+import com.example.repo.OutBoxEventRepo;
 import com.example.repo.PaymentRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +25,13 @@ import java.util.UUID;
 public class PaymentService {
     private final PaymentRepo paymentRepo;
     private final BookingClient bookingClient;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private static final String PAYMENT_TOPIC = "payment-result-events";
+    private final ObjectMapper objectMapper;
+    private final OutBoxEventRepo outBoxEventRepo;
+//    private final KafkaTemplate<String, Object> kafkaTemplate;
+//    private static final String PAYMENT_TOPIC = "payment-result-events";
 
     @Transactional
-    public PaymentResponse initiatePayment(String token, PaymentRequest request){
+    public PaymentResponse initiatePayment(String token, PaymentRequest request) throws JsonProcessingException {
         BookingResponse booking = bookingClient.findBookingByBookingReference(token, request.getBookingReference());
         if(!booking.getStatus().name().equals("AWAITING_PAYMENT")){
             throw new BookingStatusException("Your Booking Status is " + booking.getStatus().name() + " not AWAITING_PAYMENT");
@@ -43,15 +48,25 @@ public class PaymentService {
                 .paymentStatus(Payment.PaymentStatus.valueOf(isSuccessful? "SUCCESS" : "FAILED"))
                 .build();
         Payment savedPayment = paymentRepo.save(payment);
+
         PaymentCompletedEvent event = PaymentCompletedEvent
                 .builder()
                 .paymentId(savedPayment.getId())
                 .bookingReference(savedPayment.getBookingReference())
                 .transactionId(savedPayment.getTransactionId())
-                .status(savedPayment.getPaymentStatus().name().equals("SUCCESS") ? "SUCCESS" : "FAILED")
-                .message(savedPayment.getPaymentStatus().name().equals("SUCCESS") ? "PAYMENT SUCCESSFUL" : "PAYMENT FAILED")
+                .status(isSuccessful ? "SUCCESS" : "FAILED")
+                .message(isSuccessful ? "PAYMENT IS SUCCESS" : "PAYMENT IS FAILURE")
                 .build();
-        kafkaTemplate.send(PAYMENT_TOPIC, savedPayment.getBookingReference(), event);
+
+        OutBoxEvent outBoxEvent = OutBoxEvent
+                .builder()
+                .aggregateType("PAYMENT")
+                .aggregateId(savedPayment.getBookingReference())
+                .topic("payment-result-events")
+                .payload(objectMapper.writeValueAsString(event))
+                .status(false)
+                .build();
+        outBoxEventRepo.save(outBoxEvent);
         return PaymentResponse
                 .builder()
                 .paymentId(savedPayment.getId())

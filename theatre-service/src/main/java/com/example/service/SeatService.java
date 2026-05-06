@@ -2,8 +2,8 @@ package com.example.service;
 
 import com.example.component.MapperComponent;
 import com.example.dtos.*;
-import com.example.exception.ScreenNotFoundException;
-import com.example.exception.SeatAlreadyExistsException;
+import com.example.exceptions.ScreenNotFoundException;
+import com.example.exceptions.SeatAlreadyExistsException;
 import com.example.models.City;
 import com.example.models.Screen;
 import com.example.models.Seat;

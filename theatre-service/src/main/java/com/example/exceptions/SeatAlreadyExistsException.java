@@ -1,4 +1,4 @@
-package com.example.exception;
+package com.example.exceptions;
 
 public class SeatAlreadyExistsException extends RuntimeException {
     public SeatAlreadyExistsException(String message) {

@@ -4,9 +4,8 @@ import com.example.clients.MovieClient;
 import com.example.clients.ScreenClient;
 import com.example.component.MapperComponent;
 import com.example.dtos.*;
-import com.example.exception.ShowNotFoundException;
-import com.example.exception.ShowSeatNotFoundException;
-import com.example.exception.ShowSeatStatusException;
+import com.example.exceptions.ShowNotFoundException;
+import com.example.exceptions.ShowSeatStatusException;
 import com.example.models.Show;
 import com.example.models.ShowSeat;
 import com.example.repo.ShowRepo;
@@ -118,6 +117,7 @@ public class ShowService {
         return request.getBasePrice();
     }
 
+    @Transactional
     public List<ShowSeatResponse> getAllShowSeatsByIds(List<Integer> ids){
         List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(ids);
         return showSeats
@@ -126,6 +126,7 @@ public class ShowService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ShowSeatResponse> updateShowSeatStatusToLocked(List<Integer> showSheatIds){
         List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(showSheatIds);
         for(ShowSeat seat : showSeats){
@@ -150,6 +151,7 @@ public class ShowService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ShowSeatResponse> updateShowSeatStatusToBooked(List<Integer> showSeatIds){
         List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(showSeatIds);
         for(ShowSeat seat : showSeats){
@@ -163,6 +165,7 @@ public class ShowService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ShowSeatResponse> revertUpdatedStatusAvailable(List<Integer> showSeatIds){
         List<ShowSeat> showSeats = showSeatRepo.findAllByIdIn(showSeatIds);
         for(ShowSeat seat : showSeats){

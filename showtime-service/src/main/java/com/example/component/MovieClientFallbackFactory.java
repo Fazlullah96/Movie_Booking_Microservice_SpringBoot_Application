@@ -2,8 +2,8 @@ package com.example.component;
 
 import com.example.clients.MovieClient;
 import com.example.dtos.MovieResponse;
-import com.example.exception.MovieNotFoundException;
-import com.example.exception.ServiceUnavailableException;
+import com.example.exceptions.MovieNotFoundException;
+import com.example.exceptions.ServiceUnavailableException;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

@@ -6,9 +6,9 @@ import com.example.dtos.LoginRequest;
 import com.example.dtos.TokenResponse;
 import com.example.dtos.UserRegistration;
 import com.example.dtos.UserResponse;
-import com.example.exception.InvalidCredentialsException;
-import com.example.exception.KeycloakRegistrationFailedException;
-import com.example.exception.UserNotFoundException;
+import com.example.exceptions.InvalidCredentialsException;
+import com.example.exceptions.KeycloakRegistrationFailedException;
+import com.example.exceptions.UserNotFoundException;
 import com.example.models.User;
 import com.example.repo.UserRepo;
 import jakarta.ws.rs.core.Response;
@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 
