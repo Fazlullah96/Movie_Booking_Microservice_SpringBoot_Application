@@ -4,6 +4,7 @@ import com.example.clients.ShowClient;
 import com.example.clients.UserClient;
 import com.example.dtos.*;
 import com.example.events.BookingCreatedEvent;
+import com.example.exceptions.BookingNotFoundException;
 import com.example.exceptions.SeatAlreadyLockedException;
 import com.example.model.Booking;
 import com.example.model.BookingSeat;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public class BookingService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private static final String BOOKING_TOPIC = "booking-events";
 
-
+    @Transactional
     public BookingResponse createBooking(String token, BookingRequest request){
         UserResponse user = userClient.getUserByUserId(token, request.getUserId());
         List<Integer> requestShowSeatIds = request.getShowSeatIds();
@@ -75,6 +77,7 @@ public class BookingService {
             Booking booking = Booking
                     .builder()
                     .bookingReference(getBookingReference())
+                    .transactionId(null)
                     .userId(request.getUserId())
                     .showId(request.getShowId())
                     .totalAmount(totalAmount)
@@ -105,6 +108,8 @@ public class BookingService {
                     .builder()
                     .bookingId(savedBooking.getId())
                     .bookingReference(savedBooking.getBookingReference())
+                    .transactionId(savedBooking.getTransactionId())
+                    .userId(savedBooking.getUserId())
                     .showId(savedBooking.getShowId())
                     .totalAmount(savedBooking.getTotalAmount())
                     .status(savedBooking.getBookingStatus())
@@ -128,5 +133,29 @@ public class BookingService {
 
     public String getBookingReference(){
         return "BKG-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    public BookingResponse getBookingByBookingReference(String bookingReference){
+        Booking booking = bookingRepo.findByBookingReference(bookingReference)
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found for BookingReference: " + bookingReference));
+        return BookingResponse
+                .builder()
+                .bookingId(booking.getId())
+                .bookingReference(booking.getBookingReference())
+                .transactionId(booking.getTransactionId())
+                .userId(booking.getUserId())
+                .showId(booking.getShowId())
+                .totalAmount(booking.getTotalAmount())
+                .status(booking.getBookingStatus())
+                .bookingTime(booking.getBookingTime())
+                .bookedSeats(booking.getBookedSeats()
+                        .stream()
+                        .map(bookingSeat -> BookedSeatInfo
+                                .builder()
+                                .showSeatId(bookingSeat.getShowSeatId())
+                                .price(bookingSeat.getPriceAtBooking())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 }

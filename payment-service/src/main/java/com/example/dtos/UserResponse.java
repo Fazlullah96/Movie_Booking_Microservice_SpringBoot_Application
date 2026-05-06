@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentRequest {
-    private String bookingReference;
-    private String paymentMethod;
+public class UserResponse {
+    private String id;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
 }

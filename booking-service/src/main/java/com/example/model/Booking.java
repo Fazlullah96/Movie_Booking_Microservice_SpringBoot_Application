@@ -25,6 +25,7 @@ public class Booking {
     private String userId;
     @Column(nullable = false)
     private Integer showId;
+    private String transactionId;
     private Double totalAmount;
     @Enumerated(EnumType.STRING)
     private Status bookingStatus;

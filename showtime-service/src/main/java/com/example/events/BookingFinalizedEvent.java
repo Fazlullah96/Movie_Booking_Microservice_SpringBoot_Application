@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class BookingFinalizedEvent {
     private String bookingReference;
+    private Integer showId;
     private List<Integer> showSeatIds;
     private String finalStatus;
 }

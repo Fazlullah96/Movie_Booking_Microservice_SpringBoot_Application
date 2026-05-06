@@ -1,5 +1,7 @@
-package com.example.events;
+package com.example.component;
 
+import com.example.events.BookingFinalizedEvent;
+import com.example.events.PaymentCompletedEvent;
 import com.example.exceptions.BookingNotFoundException;
 import com.example.model.Booking;
 import com.example.repo.BookingRepo;
@@ -21,20 +23,23 @@ public class PaymentResultListener {
     public void finalizeBooking(PaymentCompletedEvent event){
         Booking booking = bookingRepo.findByBookingReference(event.getBookingReference())
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found for BookingReference: " + event.getBookingReference()));
-        BookingFinalizedEvent finalEvent = BookingFinalizedEvent
+
+        BookingFinalizedEvent finalizedEvent = BookingFinalizedEvent
                 .builder()
-                .bookingReference(booking.getBookingReference())
-                .showSeatIds(bookingSeatRepo.findAllByBookingSeatId())
+                .bookingReference(event.getBookingReference())
+                .showId(booking.getShowId())
+                .showSeatIds(bookingRepo.findAllBookingSeatIdByBookingReference(event.getBookingReference()))
                 .build();
+
         if(event.getStatus().equals("SUCCESS")){
             booking.setBookingStatus(Booking.Status.valueOf("SUCCESS"));
             bookingRepo.save(booking);
-            finalEvent.setFinalStatus("CONFIRMED");
+            finalizedEvent.setFinalStatus("SUCCESS");
         }else{
             booking.setBookingStatus(Booking.Status.valueOf("CANCELLED"));
             bookingRepo.save(booking);
-            finalEvent.setFinalStatus("CANCELLED");
+            finalizedEvent.setFinalStatus("FAILURE");
         }
-        kafkaTemplate.send(BOOKING_FINALIZED_TOPIC, finalEvent.getBookingReference(), finalEvent);
+        kafkaTemplate.send(BOOKING_FINALIZED_TOPIC, finalizedEvent.getBookingReference(), finalizedEvent);
     }
 }

@@ -20,7 +20,14 @@ public class BookingResponse {
     private String userId;
     private Integer showId;
     private Double totalAmount;
-    private Booking.Status status;
+    private Status status;
     private LocalDateTime bookingTime;
     private List<BookedSeatInfo> bookedSeats;
+
+    public enum Status{
+        PENDING,
+        SUCCESS,
+        CANCELLED,
+        AWAITING_PAYMENT
+    }
 }

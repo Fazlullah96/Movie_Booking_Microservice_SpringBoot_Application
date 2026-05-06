@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentRequest {
-    private String bookingReference;
-    private String paymentMethod;
+public class BookedSeatInfo {
+    private Integer showSeatId;
+    private Double price;
 }
