@@ -123,6 +123,7 @@ public class MovieService {
         Movie movie = movieRepo.findById(id)
                 .orElseThrow(() -> new MovieNotFoundException("Movie not found for MovieId: " + id));
         Movie updatedMovie = mapper.toMovieEntity(request);
+        updatedMovie.setId(movie.getId());
         updatedMovie.setIsActive(true);
         Movie savedMovie = movieRepo.save(updatedMovie);
         return mapper.toMovieResponse(savedMovie);

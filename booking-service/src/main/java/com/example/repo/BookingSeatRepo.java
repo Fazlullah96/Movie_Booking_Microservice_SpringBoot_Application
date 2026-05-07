@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BookingSeatRepo extends JpaRepository<BookingSeat, Integer> {
-    @Query("SELECT b.id FROM bookingSeat b")
+    @Query("SELECT b.id FROM BookingSeat b")
     List<Integer> findAllByBookingSeatId();
 }

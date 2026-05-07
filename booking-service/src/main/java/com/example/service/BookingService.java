@@ -94,7 +94,7 @@ public class BookingService {
                     .stream()
                     .map(showSeat -> BookingSeat
                             .builder()
-                            .showSeatId(showSeat.getSeatId())
+                            .showSeatId(showSeat.getId())
                             .priceAtBooking(showSeat.getPrice())
                             .booking(booking)
                             .build())

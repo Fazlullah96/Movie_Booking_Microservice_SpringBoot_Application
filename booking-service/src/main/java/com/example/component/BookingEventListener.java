@@ -32,7 +32,7 @@ public class BookingEventListener {
             bookingRepo.save(booking);
 
             for(Integer showSeatId : event.getShowSeatIds()){
-                redisTemplate.delete("SEAT:LOCK:"+showSeatId);
+                redisTemplate.delete("LOCK:SEAT:"+showSeatId);
             }
         }
     }
