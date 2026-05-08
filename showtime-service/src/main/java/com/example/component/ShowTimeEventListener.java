@@ -24,8 +24,9 @@ public class ShowTimeEventListener {
 //    private static final  String SHOWTIME_TOPIC = "seat-events";
 
     @KafkaListener(topics = "booking-events", groupId = "showtime-service-group")
-    public void handleBookingCreatedEvent(BookingCreatedEvent event) throws JsonProcessingException {
+    public void handleBookingCreatedEvent(String eventPayload) throws JsonProcessingException {
 
+        BookingCreatedEvent event = objectMapper.readValue(eventPayload, BookingCreatedEvent.class);
         SeatLockedEvent replyEvent = SeatLockedEvent
                 .builder()
                 .bookingReference(event.getBookingReference())

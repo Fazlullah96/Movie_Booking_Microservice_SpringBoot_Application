@@ -18,7 +18,7 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
                 if(cause instanceof FeignException.NotFound){
                     throw new UserNotFoundException("User not found for USERID: " + userId);
                 }
-                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
+                throw new ServiceUnavailableException("USER SERVICE UNAVAILABLE......");
             }
         };
     }

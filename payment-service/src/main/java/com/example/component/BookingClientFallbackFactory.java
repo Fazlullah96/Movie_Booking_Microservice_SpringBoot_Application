@@ -18,7 +18,7 @@ public class BookingClientFallbackFactory implements FallbackFactory<BookingClie
                 if(cause instanceof FeignException.NotFound){
                     throw new BookingNotFoundException("Booking not found for BookingReference: " + bookingReference);
                 }
-                throw new ServiceUnavailableException("SERVICE UNAVAILABLE.....");
+                throw new ServiceUnavailableException("BOOKING SERVICE UNAVAILABLE.....");
             }
         };
     }

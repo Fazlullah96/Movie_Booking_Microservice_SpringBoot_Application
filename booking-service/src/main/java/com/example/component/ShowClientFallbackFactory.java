@@ -22,12 +22,12 @@ public class ShowClientFallbackFactory implements FallbackFactory<ShowClient> {
                 if(cause instanceof FeignException.NotFound){
                     throw new ShowNotFoundException("Show not found for SHOWID: " + showId);
                 }
-                throw new ServiceUnavailableException("SERVICE UNAVAILABLE.....");
+                throw new ServiceUnavailableException("SHOWTIME SERVICE UNAVAILABLE.....");
             }
 
             @Override
             public List<ShowSeatResponse> getAllShowSeatByIds(String token, List<Integer> showSeatIds) {
-                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
+                throw new ServiceUnavailableException("SHOWTIME SERVICE UNAVAILABLE......");
             }
 
             @Override
@@ -35,7 +35,7 @@ public class ShowClientFallbackFactory implements FallbackFactory<ShowClient> {
                 if(cause instanceof FeignException.BadRequest){
                     throw new ShowSeatStatusException("ShowSeatId: " + showSeatIds + " bad status Update");
                 }
-                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
+                throw new ServiceUnavailableException("SHOWTIME SERVICE UNAVAILABLE......");
             }
 
             @Override
@@ -43,7 +43,7 @@ public class ShowClientFallbackFactory implements FallbackFactory<ShowClient> {
                 if(cause instanceof FeignException.BadRequest){
                     throw new ShowSeatStatusException("ShowSeatId: " + showSeatIds + " bad status Update");
                 }
-                throw new ServiceUnavailableException("SERVICE UNAVAILABLE......");
+                throw new ServiceUnavailableException("SHOWTIME SERVICE UNAVAILABLE......");
             }
         };
     }

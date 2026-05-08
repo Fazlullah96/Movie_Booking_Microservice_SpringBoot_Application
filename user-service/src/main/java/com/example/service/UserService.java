@@ -31,6 +31,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -146,5 +148,19 @@ public class UserService {
                 .lastName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllUsers(){
+        List<User> users = userRepo.findAll();
+        return users
+                .stream()
+                .map(user -> UserResponse.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .phoneNumber(user.getPhoneNumber()).build())
+                .collect(Collectors.toList());
     }
 }

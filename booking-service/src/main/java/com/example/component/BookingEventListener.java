@@ -4,6 +4,8 @@ import com.example.events.SeatLockedEvent;
 import com.example.exceptions.BookingNotFoundException;
 import com.example.model.Booking;
 import com.example.repo.BookingRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,10 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookingEventListener {
     private final BookingRepo bookingRepo;
     private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     @KafkaListener(topics = "seat-events", groupId = "booking-service-group")
-    public void handleBookingEvent(SeatLockedEvent event){
+    public void handleBookingEvent(String eventPayload) throws JsonProcessingException {
+        SeatLockedEvent event = objectMapper.readValue(eventPayload, SeatLockedEvent.class);
         Booking booking = bookingRepo.findByBookingReference(event.getBookingReference())
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found for BookingReference: " + event.getBookingReference()));
 

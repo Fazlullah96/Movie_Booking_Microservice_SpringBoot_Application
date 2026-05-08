@@ -19,7 +19,7 @@ public class OutBoxEventMessageRelay {
 
     @Scheduled(fixedDelay = 5000)
     public void relayMessage(){
-        List<OutBoxEvent> events = outBoxEventRepo.findAllByIsFalse();
+        List<OutBoxEvent> events = outBoxEventRepo.findAllByStatusFalse();
         for(OutBoxEvent event : events){
             try{
                 kafkaTemplate.send(event.getTopic(), event.getAggregateId(), event.getPayload())

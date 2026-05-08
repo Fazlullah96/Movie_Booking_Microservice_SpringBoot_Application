@@ -3,18 +3,22 @@ package com.example.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
+    private final RedisConnectionFactory connectionFactory;
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory){
         ObjectMapper objectMapper = new ObjectMapper();
@@ -25,11 +29,9 @@ public class RedisConfig {
                 ObjectMapper.DefaultTyping.NON_FINAL
         );
 
-
-        RedisCacheConfiguration configuration = RedisCacheConfiguration
-                .defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
+        RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
+                .entryTtl(Duration.ofMinutes(10))
                 .serializeValuesWith(RedisSerializationContext
                         .SerializationPair
                         .fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
@@ -37,5 +39,9 @@ public class RedisConfig {
                 .builder(connectionFactory)
                 .cacheDefaults(configuration)
                 .build();
+    }
+    @Bean
+    public StringRedisTemplate redisTemplate(){
+        return new StringRedisTemplate(connectionFactory);
     }
 }

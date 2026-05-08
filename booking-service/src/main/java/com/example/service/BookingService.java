@@ -11,6 +11,7 @@ import com.example.model.BookingSeat;
 import com.example.model.OutBoxEvent;
 import com.example.repo.BookingRepo;
 import com.example.repo.OutBoxEventRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class BookingService {
 //    private static final String BOOKING_TOPIC = "booking-events";
 
     @Transactional
-    public BookingResponse createBooking(String token, BookingRequest request){
+    public BookingResponse createBooking(String token, BookingRequest request) throws JsonProcessingException {
         UserResponse user = userClient.getUserByUserId(token, request.getUserId());
         List<Integer> requestShowSeatIds = request.getShowSeatIds();
         List<String> successfullyLockedSeats = new ArrayList<>();

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "booking-service", fallbackFactory = BookingClientFallbackFactory.class)
 public interface BookingClient {
-    @GetMapping("/api/booking/{bookingReference}")
+    @GetMapping("/api/booking/reference/{bookingReference}")
     BookingResponse findBookingByBookingReference(
             @RequestHeader("Authorization") String token,
             @PathVariable("bookingReference") String bookingReference

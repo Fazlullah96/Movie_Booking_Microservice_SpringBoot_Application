@@ -1,6 +1,5 @@
 package com.example.dtos;
 
-import com.example.model.Booking;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -28,7 +28,8 @@ public class PaymentResultListener {
 
     @Transactional
     @KafkaListener(topics = "payment-result-events", groupId = "booking-service-group")
-    public void finalizeBooking(PaymentCompletedEvent event) throws JsonProcessingException {
+    public void finalizeBooking(String eventPayload) throws JsonProcessingException {
+        PaymentCompletedEvent event = objectMapper.readValue(eventPayload, PaymentCompletedEvent.class);
         Booking booking = bookingRepo.findByBookingReference(event.getBookingReference())
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found for BookingReference: " + event.getBookingReference()));
 
@@ -46,6 +47,7 @@ public class PaymentResultListener {
 
         if(event.getStatus().equals("SUCCESS")){
             booking.setBookingStatus(Booking.Status.valueOf("SUCCESS"));
+            booking.setTransactionId(event.getTransactionId());
             bookingRepo.save(booking);
             finalizedEvent.setFinalStatus("SUCCESS");
         }else{
