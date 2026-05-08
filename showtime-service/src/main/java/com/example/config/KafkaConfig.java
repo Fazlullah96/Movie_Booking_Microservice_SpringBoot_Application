@@ -11,7 +11,7 @@ public class KafkaConfig {
     public NewTopic seatEventsTopic(){
         return TopicBuilder
                 .name("seat-events")
-                .partitions(3)
+                .partitions(2)
                 .replicas(1)
                 .build();
     }

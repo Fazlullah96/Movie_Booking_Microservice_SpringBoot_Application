@@ -11,7 +11,7 @@ public class KafkaConfig {
     public NewTopic bookingEventsTopic(){
         return TopicBuilder
                 .name("booking-events")
-                .partitions(3)
+                .partitions(2)
                 .replicas(1)
                 .build();
     }
@@ -20,7 +20,7 @@ public class KafkaConfig {
     public NewTopic bookingFinalizedEventsTopic(){
         return TopicBuilder
                 .name("booking-finalized-events")
-                .partitions(3)
+                .partitions(2)
                 .replicas(1)
                 .build();
     }
